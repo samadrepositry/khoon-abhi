@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Khoon Abhi — Find nearby blood donors instantly. خون ابھی — قریبی بلڈ ڈونر فوراً تلاش کریں۔ Demo version">
+<link rel="icon" href="data:,">
+<title>خون ابھی — Khoon Abhi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#B91C1C; --red-dark:#7F1D1D; --red-deep:#991B1B; --red-light:#FEF2F2; --red-mid:#FEE2E2;
+  --bg:#FFFBF8; --surface:#FFFFFF; --surface2:#FFF7ED;
+  --text:#1C1917; --muted:#57534E; --border:#E7E5E4;
+  --green:#15803D; --green-bg:#DCFCE7;
+  --amber:#92400E; --amber-bg:#FEF3C7;
+  --radius:18px;
+  --shadow:0 4px 24px rgba(153,27,27,.08), 0 1px 3px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#140808; --surface:#1F0F0F; --surface2:#2A1212; --text:#FEF2F2; --muted:#D6CFCF; --border:#3F1D1D; --red-light:#2A1212; --red-mid:#3F1D1D; --shadow:0 4px 24px rgba(0,0,0,.4); }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Naskh Arabic", system-ui, sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+[dir="ltr"] body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.6}
+a{color:inherit}
+button,input,select,textarea{font:inherit}
+button,[role="button"],select,input,textarea{min-height:48px}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px;border-radius:8px}
+
+/* Emergency bar */
+.emergency{position:sticky;top:0;z-index:50;background:#7F1D1D;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;flex-wrap:wrap}
+.emergency p{margin:0;font-size:14px;line-height:1.5;font-weight:600;flex:1;min-width:180px}
+.emergency a{background:#fff;color:#7F1D1D;text-decoration:none;font-weight:800;padding:9px 16px;border-radius:999px;white-space:nowrap;font-size:15px;display:inline-flex;align-items:center;gap:6px;min-height:44px}
+
+/* Language switch */
+.lang-switch{display:inline-flex;background:rgba(0,0,0,.25);border:1.5px solid rgba(255,255,255,.55);border-radius:999px;padding:3px;gap:3px;flex-shrink:0}
+.lang-switch button{border:0;background:transparent;color:#fff;font-weight:800;font-size:13.5px;padding:7px 14px;border-radius:999px;cursor:pointer;min-height:38px;line-height:1.3}
+.lang-switch button.active{background:#fff;color:#7F1D1D}
+.lang-switch.hero-switch{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35)}
+.lang-switch.hero-switch button.active{background:#fff;color:#991B1B}
+
+/* Hero */
+.hero{background:linear-gradient(180deg,#991B1B 0%, #B91C1C 55%, #DC2626 100%);color:#fff;padding:28px 20px 36px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset-inline-start:-40px;bottom:-70px;width:220px;height:220px;background:rgba(255,255,255,.08);border-radius:50%}
+.hero-inner{max-width:1080px;margin:0 auto;position:relative;z-index:1}
+.toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.demo-badge{background:#FDE68A;color:#92400E;border:2px dashed #92400E;padding:6px 14px;border-radius:999px;font-weight:800;font-size:13px;letter-spacing:.02em}
+.live-dot{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);padding:7px 12px;border-radius:999px;font-size:13px}
+.live-dot i{width:9px;height:9px;background:#4ADE80;border-radius:50%;display:block;box-shadow:0 0 0 5px rgba(74,222,128,.25);flex-shrink:0}
+.hero h1{font-family:"Noto Nastaliq Urdu", serif;font-size:52px;line-height:1.9;margin:10px 0 6px;font-weight:700;padding:14px 0 10px}
+[dir="ltr"] .hero h1{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:44px;line-height:1.15;letter-spacing:-.02em;padding:10px 0 4px}
+.hero h1 span{font-family:"Noto Naskh Arabic",sans-serif;font-size:15px;display:block;letter-spacing:.14em;opacity:.9;font-weight:600;margin-top:16px;line-height:1.6}
+[dir="ltr"] .hero h1 span{font-family:system-ui,sans-serif}
+.hero-sub{font-size:18px;line-height:1.9;max-width:620px;margin:10px 0 0;opacity:.95}
+[dir="ltr"] .hero-sub{line-height:1.65}
+.hero-sub strong{background:#fff;color:#991B1B;padding:1px 8px;border-radius:6px}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px;max-width:640px}
+.stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px 14px}
+.stat b{font-size:26px;display:block;line-height:1.1}
+.stat span{font-size:13px;opacity:.9}
+.drop{position:absolute;inset-inline-end:18px;top:110px;width:92px;height:118px;background:#fff;color:#B91C1C;border-radius:0 50% 50% 50%;transform:rotate(45deg);display:none;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.drop span{transform:rotate(-45deg);font-weight:900;font-size:28px;line-height:1;text-align:center}
+.drop small{transform:rotate(-45deg);display:block;font-size:11px}
+@media(min-width:700px){.drop{display:grid}.hero h1{font-size:68px}[dir="ltr"] .hero h1{font-size:56px}}
+
+/* Nav chips */
+.quicknav{max-width:1080px;margin:-18px auto 0;padding:0 16px;position:relative;z-index:2}
+.quicknav-inner{background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);border-radius:22px;padding:6px;display:flex;gap:4px;flex-wrap:wrap}
+.quicknav a{flex:1 1 30%;text-align:center;text-decoration:none;padding:10px 8px;border-radius:14px;font-weight:700;font-size:13.5px;white-space:normal;line-height:1.5;min-height:44px;display:flex;align-items:center;justify-content:center}
+@media(min-width:760px){.quicknav-inner{border-radius:999px;flex-wrap:nowrap}.quicknav a{border-radius:999px;white-space:nowrap;flex:1}}
+.quicknav a.active,.quicknav a:hover{background:var(--red);color:#fff}
+
+.wrap{max-width:1080px;margin:0 auto;padding:28px 16px 10px}
+.section{margin:34px 0}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.section-head h2{font-family:"Noto Nastaliq Urdu",serif;font-size:28px;line-height:2;margin:0;padding:6px 0 8px}
+[dir="ltr"] .section-head h2{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:26px;line-height:1.25;letter-spacing:-.01em;padding:2px 0 4px}
+.section-head p{margin:4px 0 0;color:var(--muted);font-size:15px}
+.kicker{font-size:13px;font-weight:800;color:var(--red);background:var(--red-light);border:1px solid var(--red-mid);display:inline-block;padding:3px 10px;border-radius:999px;margin-bottom:8px}
+
+/* Picker */
+.picker-card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:20px;box-shadow:var(--shadow)}
+.picker-label{font-weight:800;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.picker-label small{color:var(--muted);font-weight:500}
+.groups{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.group-btn{border:2px solid var(--border);background:var(--bg);border-radius:16px;padding:12px 6px;cursor:pointer;text-align:center;transition:.15s}
+.group-btn b{font-size:22px;display:block;line-height:1}
+.group-btn span{font-size:12px;color:var(--muted)}
+.group-btn.selected{border-color:var(--red);background:var(--red);color:#fff}
+.group-btn.selected span{color:#FECACA}
+.group-btn.all{grid-column:span 4;display:flex;justify-content:center;gap:8px;align-items:center}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.chip{border:1.5px solid var(--border);background:var(--surface);border-radius:999px;padding:9px 16px;cursor:pointer;font-weight:600;font-size:14px;min-height:44px}
+.chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.search-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.search-row input{flex:1;min-width:200px;border:1.5px solid var(--border);background:var(--bg);border-radius:12px;padding:12px 14px;color:var(--text)}
+.compat-note{margin-top:14px;background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.8}
+@media (prefers-color-scheme: dark){.compat-note{background:#2A1E05;color:#FDE68A;border-color:#92400E}}
+
+/* Donor cards */
+.donor-grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:700px){.donor-grid{grid-template-columns:1fr 1fr}}
+@media(min-width:980px){.donor-grid{grid-template-columns:1fr 1fr 1fr}}
+.donor{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px}
+.donor-top{display:flex;gap:14px;align-items:flex-start}
+.avatar{width:56px;height:56px;border-radius:16px;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:900;font-size:18px;flex-shrink:0;position:relative;text-align:center;padding:4px}
+.avatar::after{content:"";position:absolute;bottom:-2px;inset-inline-end:-2px;width:14px;height:14px;border-radius:50%;background:#22C55E;border:2px solid var(--surface)}
+.donor h3{margin:0;font-size:18px;line-height:1.4}
+.donor-meta{color:var(--muted);font-size:13.5px;line-height:1.6}
+.blood-badge{margin-inline-start:auto;background:var(--red-light);border:1.5px solid var(--red-mid);color:var(--red-dark);font-weight:900;font-size:20px;padding:6px 12px;border-radius:12px;line-height:1;white-space:nowrap}
+@media (prefers-color-scheme: dark){.blood-badge{color:#FCA5A5}}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;padding:4px 9px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-weight:600}
+.tag.green{background:var(--green-bg);color:var(--green);border-color:#BBF7D0}
+.tag.amber{background:var(--amber-bg);color:var(--amber);border-color:#FDE68A}
+.donor-actions{display:flex;gap:8px;margin-top:auto}
+.btn{flex:1;text-align:center;text-decoration:none;border-radius:12px;padding:12px 10px;font-weight:800;cursor:pointer;border:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:48px}
+.btn-call{background:var(--red);color:#fff}
+.btn-wa{background:#fff;border:1.5px solid var(--border);color:var(--text)}
+.btn-call:active{transform:scale(.98)}
+.empty{grid-column:1/-1;text-align:center;padding:36px 20px;background:var(--surface);border:1.5px dashed var(--border);border-radius:20px;color:var(--muted)}
+.empty b{color:var(--text);display:block;font-size:18px;margin-bottom:6px}
+
+/* Compatibility */
+.compat-wrap{background:var(--surface);border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}
+.compat-scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{padding:12px 10px;text-align:center;border-bottom:1px solid var(--border)}
+th{background:var(--red);color:#fff;font-weight:800}
+th:first-child,td:first-child{text-align:start;font-weight:800;background:var(--red-light)}
+@media (prefers-color-scheme: dark){th:first-child,td:first-child{background:#2A1212}}
+.yes{color:var(--green);font-weight:900;font-size:18px}
+.no{color:#D6D3D1}
+.compat-legend{display:flex;gap:16px;flex-wrap:wrap;padding:14px 16px;font-size:13px;color:var(--muted)}
+.interactive-compat{padding:18px;border-top:1px solid var(--border)}
+.interactive-compat select{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px;background:var(--bg);color:var(--text)}
+#compatResult{margin-top:12px;line-height:1.9}
+
+/* Forms */
+.two-col{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:820px){.two-col{grid-template-columns:1fr 1fr}}
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+.form-card h3{font-family:"Noto Nastaliq Urdu",serif;font-size:22px;margin:0 0 4px;line-height:2;padding:4px 0 6px}
+[dir="ltr"] .form-card h3{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:20px;line-height:1.3;padding:2px 0 4px}
+.form-card>p{color:var(--muted);font-size:14px;margin:0 0 16px}
+.field{margin-bottom:12px}
+.field label{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;background:var(--bg);color:var(--text)}
+.field textarea{min-height:84px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.submit{width:100%;background:var(--red);color:#fff;border:0;border-radius:12px;padding:14px;font-weight:800;cursor:pointer;font-size:16px}
+.submit.secondary{background:var(--text);color:var(--bg)}
+.success{display:none;margin-top:14px;background:var(--green-bg);color:#14532D;border:1px solid #86EFAC;border-radius:12px;padding:14px;line-height:1.8;font-size:14px}
+@media (prefers-color-scheme: dark){.success{color:#BBF7D0;background:#052E16}}
+.success.show{display:block}
+.success b{font-size:16px}
+
+/* Steps */
+.steps{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:700px){.steps{grid-template-columns:repeat(3,1fr)}}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:900;margin-bottom:10px}
+.step h4{margin:0 0 6px;font-size:16px}
+.step p{margin:0;color:var(--muted);font-size:14px;line-height:1.8}
+
+/* Requests list */
+.request-item{background:var(--surface);border:1px solid var(--border);border-inline-start:5px solid var(--red);border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.request-item b{font-size:15px}
+.request-item p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.urgent{background:#DC2626;color:#fff;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px}
+.normal{background:var(--surface2);border:1px solid var(--border);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
+
+footer{margin-top:40px;border-top:1px solid var(--border);padding:24px 16px 36px}
+.footer-inner{max-width:1080px;margin:0 auto;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:13.5px;line-height:1.9}
+.disclaimer{background:#FFFBEB;border:1px solid #FDE68A;border-radius:14px;padding:14px 16px;color:#92400E;font-size:13.5px;line-height:1.9;max-width:1080px;margin:0 auto 16px}
+@media (prefers-color-scheme: dark){.disclaimer{background:#2A1E05;color:#FDE68A}}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1917;color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="emergency" role="alert">
+  <p data-i18n="emergencyText">🚨 ایمرجنسی ہے؟ دیر نہ کریں — ریسکیو 1122 کو فوراً کال کریں</p>
+  <div class="lang-switch" role="group" aria-label="Language / زبان">
+    <button type="button" data-setlang="ur" class="active">اردو</button>
+    <button type="button" data-setlang="en">English</button>
+  </div>
+  <a href="tel:1122" data-i18n="emergencyCall">📞 1122 کال کریں</a>
+</div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="toprow">
+      <span class="demo-badge" data-i18n="demoBadge">⚠ DEMO — یہ ڈیمو ڈیٹا ہے، اصل ڈونرز نہیں</span>
+      <span class="live-dot"><i></i> <span data-i18n="liveDot">ڈیمو میں 12 ڈونرز درج ہیں — 10 ابھی دستیاب</span></span>
+    </div>
+    <div class="drop" aria-hidden="true"><div><span>O+</span><small data-i18n="dropNeed">سب سے زیادہ<br>ضرورت</small></div></div>
+    <h1><span class="h1-main" data-i18n="h1">خون ابھی</span> <span data-i18n="h1sub">KHOON ABHI • BLOOD, RIGHT NOW</span></h1>
+    <p class="hero-sub" data-i18n-html="heroSub">اسپتال میں خون کی ضرورت ہے؟ فون پر فون کرنے کی ضرورت نہیں۔ اپنا بلڈ گروپ چنیں، <strong>قریبی ڈونر</strong> دیکھیں اور ایک ٹیپ میں کال کریں۔ ایک بوتل خون، <strong>تین زندگیاں</strong> بچا سکتی ہے۔</p>
+    <div class="hero-stats">
+      <div class="stat"><b>12</b><span data-i18n="stat1">ڈیمو ڈونرز — 10 دستیاب، 2 غیر دستیاب</span></div>
+      <div class="stat"><b data-i18n="stat2num">5 شہر</b><span data-i18n="stat2">جیکب آباد، کراچی، لاہور، سکھر، حیدرآباد</span></div>
+      <div class="stat"><b data-i18n="stat3num">8 گروپس</b><span data-i18n="stat3">تمام بلڈ گروپس کی تلاش</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="quicknav" aria-label="Quick links">
+  <div class="quicknav-inner">
+    <a href="#search" class="active" data-i18n="navSearch">🔍 ڈونر تلاش کریں</a>
+    <a href="#donors" data-i18n="navDonors">🩸 ڈونرز کی لسٹ</a>
+    <a href="#compat" data-i18n="navCompat">🔄 کون سا خون لگے گا؟</a>
+    <a href="#request" data-i18n="navRequest">🏥 اسپتال کی درخواست</a>
+    <a href="#register-anchor" data-i18n="navRegister">✋ ڈونر بنیں</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- SEARCH -->
+  <section class="section" id="search">
+    <div class="section-head">
+      <div>
+        <span class="kicker" data-i18n="kickerStep1">مرحلہ 1 — بلڈ گروپ چنیں</span>
+        <h2 data-i18n="searchTitle">آپ کو کس گروپ کا خون چاہیے؟</h2>
+        <p data-i18n="searchSub">گروپ چنتے ہی صرف وہی ڈونرز نظر آئیں گے جن کا خون آپ کو لگ سکتا ہے۔</p>
+      </div>
+      <button class="chip" id="resetBtn" type="button" data-i18n="resetBtn">↺ سب صاف کریں</button>
+    </div>
+
+    <div class="picker-card">
+      <div class="picker-label"><span data-i18n="pickerLabel">مریض کا بلڈ گروپ منتخب کریں</span> <small id="selectedLabel"></small></div>
+      <div class="groups" id="groupPicker" role="group" aria-label="Blood group">
+        <button class="group-btn" data-group="O-" type="button"><b>O−</b><span data-i18n="gRare">نایاب</span></button>
+        <button class="group-btn" data-group="O+" type="button"><b>O+</b><span data-i18n="gCommon">عام</span></button>
+        <button class="group-btn" data-group="A-" type="button"><b>A−</b><span data-i18n="gRare2">نایاب</span></button>
+        <button class="group-btn" data-group="A+" type="button"><b>A+</b><span data-i18n="gCommon2">عام</span></button>
+        <button class="group-btn" data-group="B-" type="button"><b>B−</b><span data-i18n="gRare3">نایاب</span></button>
+        <button class="group-btn" data-group="B+" type="button"><b>B+</b><span data-i18n="gCommon3">عام</span></button>
+        <button class="group-btn" data-group="AB-" type="button"><b>AB−</b><span data-i18n="gVeryRare">بہت نایاب</span></button>
+        <button class="group-btn" data-group="AB+" type="button"><b>AB+</b><span data-i18n="gABplus">ہر گروپ لگ سکتا ہے</span></button>
+        <button class="group-btn all" data-group="" type="button" data-i18n="gAll">تمام گروپس دکھائیں — فلٹر ختم کریں</button>
+      </div>
+
+      <div class="filters" id="cityFilters" aria-label="City filter"></div>
+
+      <div class="search-row">
+        <input id="searchInput" type="search" data-i18n-ph="searchPh" placeholder="نام یا علاقہ لکھ کر تلاش کریں — مثلاً گلشن، جیکب آباد..." aria-label="Search">
+      </div>
+
+      <div class="compat-note" id="compatNote"></div>
+    </div>
+  </section>
+
+  <!-- DONORS -->
+  <section class="section" id="donors">
+    <div class="section-head">
+      <div>
+        <span class="kicker" data-i18n="kickerDonors">قریبی ڈونرز</span>
+        <h2><span data-i18n="donorsTitle">ڈونرز کی لسٹ</span> <span id="countLabel" style="font-size:16px;color:var(--muted)"></span></h2>
+        <p data-i18n-html="donorsSub">یہ تمام نام، نمبر اور فاصلے <b>ڈیمو کے لیے بنائے گئے ہیں</b> — اصل لوگ نہیں ہیں۔ کال بٹن بھی ڈیمو نمبر پر ہے۔</p>
+      </div>
+    </div>
+    <div class="donor-grid" id="donorGrid"></div>
+  </section>
+
+  <!-- LIVE REQUESTS DEMO -->
+  <section class="section" id="live-requests">
+    <div class="section-head">
+      <div>
+        <span class="kicker" data-i18n="kickerLive">لائیو درخواستیں — ڈیمو</span>
+        <h2 data-i18n="liveTitle">اسپتالوں کی تازہ درخواستیں</h2>
+        <p data-i18n="liveSub">یہ مثالی درخواستیں ہیں تاکہ آپ کو اندازہ ہو کہ اصل ایپ میں یہ حصہ کیسا نظر آئے گا۔</p>
+      </div>
+    </div>
+    <div id="requestList"></div>
+  </section>
+
+  <!-- COMPATIBILITY -->
+  <section class="section" id="compat">
+    <div class="section-head">
+      <div>
+        <span class="kicker" data-i18n="kickerInfo">معلومات</span>
+        <h2 data-i18n="compatTitle">کس کو کون سا خون لگ سکتا ہے؟</h2>
+        <p data-i18n="compatSub">بائیں طرف مریض کا گروپ ہے، اوپر ڈونر کا گروپ۔ ✓ کا مطلب ہے یہ خون لگ سکتا ہے۔</p>
+      </div>
+    </div>
+    <div class="compat-wrap">
+      <div class="compat-scroll">
+        <table aria-label="Blood group compatibility chart">
+          <thead><tr id="compatHead"></tr></thead>
+          <tbody id="compatBody"></tbody>
+        </table>
+      </div>
+      <div class="compat-legend" id="compatLegend"></div>
+      <div class="interactive-compat">
+        <label for="compatSelect" style="font-weight:800;display:block;margin-bottom:8px" data-i18n="compatLabel">اپنا گروپ چن کر فوراً جانیں — آپ کو کن ڈونرز کا خون لگ سکتا ہے؟</label>
+        <select id="compatSelect"></select>
+        <div id="compatResult" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="section-head"><div><span class="kicker" data-i18n="kickerHow">طریقہ کار</span><h2 data-i18n="howTitle">یہ کیسے کام کرتا ہے؟</h2></div></div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h4 data-i18n="step1t">گروپ اور شہر چنیں</h4><p data-i18n="step1p">مریض کا بلڈ گروپ اور اپنا شہر منتخب کریں۔ صرف مطابقت رکھنے والے قریبی ڈونرز نظر آئیں گے۔</p></div>
+      <div class="step"><div class="step-num">2</div><h4 data-i18n="step2t">ایک ٹیپ میں کال کریں</h4><p data-i18n="step2p">ڈونر کے کارڈ پر کال بٹن دبائیں، جگہ اور وقت طے کریں۔ اسپتال کی درخواست بھی یہیں سے بھیج سکتے ہیں۔</p></div>
+      <div class="step"><div class="step-num">3</div><h4 data-i18n="step3t">زندگی بچائیں</h4><p data-i18n="step3p">ڈونر اسپتال پہنچ کر خون دیتا ہے۔ ایک عطیے سے تین مریضوں کی مدد ہو سکتی ہے۔</p></div>
+    </div>
+  </section>
+
+  <!-- FORMS -->
+  <section class="section" id="request">
+    <div class="section-head">
+      <div><span class="kicker" data-i18n="kickerForm">فارم</span><h2 data-i18n="formTitle">درخواست بھیجیں یا ڈونر بنیں</h2><p data-i18n="formSub">یہ ڈیمو ہے — فارم بھرنے سے ڈیٹا کہیں محفوظ نہیں ہوتا، صرف اسی اسکرین پر نظر آتا ہے۔</p></div>
+    </div>
+    <div class="two-col">
+      <form class="form-card" id="hospitalForm" novalidate>
+        <h3 data-i18n="hFormTitle">🏥 اسپتال کی درخواست</h3>
+        <p data-i18n="hFormSub">اسپتال یا مریض کے لواحقین یہ فارم بھریں — قریبی ڈونرز کو اطلاع جائے گی (ڈیمو میں صرف تصدیقی پیغام نظر آئے گا)۔</p>
+        <div class="field"><label for="hName" data-i18n="hName">اسپتال کا نام *</label><input id="hName" required data-i18n-ph="hNamePh" placeholder="مثلاً سول اسپتال جیکب آباد"></div>
+        <div class="grid2">
+          <div class="field"><label for="hGroup" data-i18n="hGroup">درکار بلڈ گروپ *</label><select id="hGroup" required></select></div>
+          <div class="field"><label for="hBottles" data-i18n="hBottles">کتنی بوتلیں؟ *</label><select id="hBottles" required></select></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label for="hCity" data-i18n="hCity">شہر *</label><select id="hCity" required></select></div>
+          <div class="field"><label for="hUrgency" data-i18n="hUrgency">فوریت</label><select id="hUrgency"></select></div>
+        </div>
+        <div class="field"><label for="hPhone" data-i18n="hPhone">رابطہ نمبر (ڈیمو میں کوئی بھی لکھیں)</label><input id="hPhone" inputmode="tel" placeholder="03XX-XXXXXXX"></div>
+        <div class="field"><label for="hNote" data-i18n="hNote">اضافی تفصیل</label><textarea id="hNote" data-i18n-ph="hNotePh" placeholder="مریض کی حالت، وارڈ، یا کوئی خاص بات..."></textarea></div>
+        <button class="submit" type="submit" data-i18n="hSubmit">درخواست بھیجیں →</button>
+        <div class="success" id="hospitalSuccess" role="status"></div>
+      </form>
+
+      <form class="form-card" id="donorForm">
+        <span id="register-anchor"></span>
+        <h3 data-i18n="dFormTitle">✋ میں ڈونر بننا چاہتا/چاہتی ہوں</h3>
+        <p data-i18n="dFormSub">رجسٹریشن کے بعد آپ کا نام نیچے ڈونرز کی لسٹ میں شامل ہو جائے گا — صرف اس ڈیمو اسکرین پر، کہیں محفوظ نہیں ہوگا۔</p>
+        <div class="field"><label for="dName" data-i18n="dName">آپ کا نام *</label><input id="dName" required data-i18n-ph="dNamePh" placeholder="اپنا پورا نام لکھیں"></div>
+        <div class="grid2">
+          <div class="field"><label for="dGroup" data-i18n="dGroup">بلڈ گروپ *</label><select id="dGroup" required></select></div>
+          <div class="field"><label for="dCity" data-i18n="dCity">شہر *</label><select id="dCity" required></select></div>
+        </div>
+        <div class="field"><label for="dArea" data-i18n="dArea">علاقہ / محلہ</label><input id="dArea" data-i18n-ph="dAreaPh" placeholder="مثلاً گلشن اقبال، ماڈل ٹاؤن..."></div>
+        <div class="field"><label for="dPhone" data-i18n="dPhone">موبائل نمبر (ڈیمو)</label><input id="dPhone" inputmode="tel" placeholder="03XX-XXXXXXX"></div>
+        <div class="field"><label for="dLast" data-i18n="dLast">آخری بار خون کب دیا تھا؟</label><select id="dLast"></select></div>
+        <button class="submit secondary" type="submit" data-i18n="dSubmit">ڈونر کے طور پر شامل ہوں ♥</button>
+        <div class="success" id="donorSuccess" role="status"></div>
+      </form>
+    </div>
+  </section>
+
+  <div class="disclaimer" data-i18n-html="disclaimer">⚠ <b>اہم نوٹ:</b> یہ <b>خون ابھی</b> کا ڈیمو ورژن ہے۔ اس میں دکھائے گئے تمام ڈونرز، فون نمبرز، اسپتال کی درخواستیں اور فاصلے فرضی ہیں — اصل ڈیٹا نہیں۔ اصل ایمرجنسی میں ہمیشہ <b>ریسکیو 1122</b> یا قریبی اسپتال سے رابطہ کریں۔ خون دینے سے پہلے اسپتال میں بلڈ ٹیسٹ اور اسکریننگ لازمی ہوتی ہے۔</div>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div><b style="color:var(--text);font-size:16px" data-i18n="footerBrand">خون ابھی — Khoon Abhi</b><br><span data-i18n-html="footerText">پاکستان کے لیے بنایا گیا ایک خیال: ضرورت کے وقت خون، بغیر فونوں کی بھرمار کے۔<br>ایک عطیہ = تین زندگیاں۔</span></div>
+    <div><span data-i18n="footerEmerg">ایمرجنسی:</span> <a href="tel:1122" style="font-weight:800;color:var(--red)" data-i18n="footer1122">1122 (ریسکیو)</a><br><span data-i18n="footerDemo">یہ صفحہ ڈیمو ہے — کوئی ڈیٹا محفوظ نہیں ہوتا۔</span></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ============ I18N ============
+var CITY_KEYS = ["", "جیکب آباد", "کراچی", "لاہور", "سکھر", "حیدرآباد"];
+var CITIES = {
+  ur: {"": "تمام شہر", "جیکب آباد":"جیکب آباد", "کراچی":"کراچی", "لاہور":"لاہور", "سکھر":"سکھر", "حیدرآباد":"حیدرآباد", "دیگر":"دیگر"},
+  en: {"": "All cities", "جیکب آباد":"Jacobabad", "کراچی":"Karachi", "لاہور":"Lahore", "سکھر":"Sukkur", "حیدرآباد":"Hyderabad", "دیگر":"Other"}
+};
+var I18N = {
+ur: {
+  emergencyText:"🚨 ایمرجنسی ہے؟ دیر نہ کریں — ریسکیو 1122 کو فوراً کال کریں",
+  emergencyCall:"📞 1122 کال کریں",
+  demoBadge:"⚠ DEMO — یہ ڈیمو ڈیٹا ہے، اصل ڈونرز نہیں",
+  liveDot:"ڈیمو میں 12 ڈونرز درج ہیں — 10 ابھی دستیاب",
+  dropNeed:"سب سے زیادہ<br>ضرورت",
+  h1:"خون ابھی", h1sub:"KHOON ABHI • BLOOD, RIGHT NOW",
+  heroSub:"اسپتال میں خون کی ضرورت ہے؟ فون پر فون کرنے کی ضرورت نہیں۔ اپنا بلڈ گروپ چنیں، <strong>قریبی ڈونر</strong> دیکھیں اور ایک ٹیپ میں کال کریں۔ ایک بوتل خون، <strong>تین زندگیاں</strong> بچا سکتی ہے۔",
+  stat1:"ڈیمو ڈونرز — 10 دستیاب، 2 غیر دستیاب", stat2num:"5 شہر", stat2:"جیکب آباد، کراچی، لاہور، سکھر، حیدرآباد", stat3num:"8 گروپس", stat3:"تمام بلڈ گروپس کی تلاش",
+  navSearch:"🔍 ڈونر تلاش کریں", navDonors:"🩸 ڈونرز کی لسٹ", navCompat:"🔄 کون سا خون لگے گا؟", navRequest:"🏥 اسپتال کی درخواست", navRegister:"✋ ڈونر بنیں",
+  kickerStep1:"مرحلہ 1 — بلڈ گروپ چنیں", searchTitle:"آپ کو کس گروپ کا خون چاہیے؟", searchSub:"گروپ چنتے ہی صرف وہی ڈونرز نظر آئیں گے جن کا خون آپ کو لگ سکتا ہے۔", resetBtn:"↺ سب صاف کریں",
+  pickerLabel:"مریض کا بلڈ گروپ منتخب کریں",
+  gRare:"نایاب", gCommon:"عام", gRare2:"نایاب", gCommon2:"عام", gRare3:"نایاب", gCommon3:"عام", gVeryRare:"بہت نایاب", gABplus:"ہر گروپ لگ سکتا ہے", gAll:"تمام گروپس دکھائیں — فلٹر ختم کریں",
+  searchPh:"نام یا علاقہ لکھ کر تلاش کریں — مثلاً گلشن، جیکب آباد...",
+  kickerDonors:"قریبی ڈونرز", donorsTitle:"ڈونرز کی لسٹ", donorsSub:"یہ تمام نام، نمبر اور فاصلے <b>ڈیمو کے لیے بنائے گئے ہیں</b> — اصل لوگ نہیں ہیں۔ کال بٹن بھی ڈیمو نمبر پر ہے۔",
+  kickerLive:"لائیو درخواستیں — ڈیمو", liveTitle:"اسپتالوں کی تازہ درخواستیں", liveSub:"یہ مثالی درخواستیں ہیں تاکہ آپ کو اندازہ ہو کہ اصل ایپ میں یہ حصہ کیسا نظر آئے گا۔",
+  kickerInfo:"معلومات", compatTitle:"کس کو کون سا خون لگ سکتا ہے؟", compatSub:"بائیں طرف مریض کا گروپ ہے، اوپر ڈونر کا گروپ۔ ✓ کا مطلب ہے یہ خون لگ سکتا ہے۔",
+  compatLabel:"اپنا گروپ چن کر فوراً جانیں — آپ کو کن ڈونرز کا خون لگ سکتا ہے؟",
+  kickerHow:"طریقہ کار", howTitle:"یہ کیسے کام کرتا ہے؟",
+  step1t:"گروپ اور شہر چنیں", step1p:"مریض کا بلڈ گروپ اور اپنا شہر منتخب کریں۔ صرف مطابقت رکھنے والے قریبی ڈونرز نظر آئیں گے۔",
+  step2t:"ایک ٹیپ میں کال کریں", step2p:"ڈونر کے کارڈ پر کال بٹن دبائیں، جگہ اور وقت طے کریں۔ اسپتال کی درخواست بھی یہیں سے بھیج سکتے ہیں۔",
+  step3t:"زندگی بچائیں", step3p:"ڈونر اسپتال پہنچ کر خون دیتا ہے۔ ایک عطیے سے تین مریضوں کی مدد ہو سکتی ہے۔",
+  kickerForm:"فارم", formTitle:"درخواست بھیجیں یا ڈونر بنیں", formSub:"یہ ڈیمو ہے — فارم بھرنے سے ڈیٹا کہیں محفوظ نہیں ہوتا، صرف اسی اسکرین پر نظر آتا ہے۔",
+  hFormTitle:"🏥 اسپتال کی درخواست", hFormSub:"اسپتال یا مریض کے لواحقین یہ فارم بھریں — قریبی ڈونرز کو اطلاع جائے گی (ڈیمو میں صرف تصدیقی پیغام نظر آئے گا)۔",
+  hName:"اسپتال کا نام *", hNamePh:"مثلاً سول اسپتال جیکب آباد", hGroup:"درکار بلڈ گروپ *", hBottles:"کتنی بوتلیں؟ *", hCity:"شہر *", hUrgency:"فوریت", hPhone:"رابطہ نمبر (ڈیمو میں کوئی بھی لکھیں)", hNote:"اضافی تفصیل", hNotePh:"مریض کی حالت، وارڈ، یا کوئی خاص بات...", hSubmit:"درخواست بھیجیں →",
+  dFormTitle:"✋ میں ڈونر بننا چاہتا/چاہتی ہوں", dFormSub:"رجسٹریشن کے بعد آپ کا نام ڈونرز کی لسٹ میں شامل ہو جائے گا — صرف اس ڈیمو اسکرین پر، کہیں محفوظ نہیں ہوگا۔",
+  dName:"آپ کا نام *", dNamePh:"اپنا پورا نام لکھیں", dGroup:"بلڈ گروپ *", dCity:"شہر *", dArea:"علاقہ / محلہ", dAreaPh:"مثلاً گلشن اقبال، ماڈل ٹاؤن...", dPhone:"موبائل نمبر (ڈیمو)", dLast:"آخری بار خون کب دیا تھا؟", dSubmit:"ڈونر کے طور پر شامل ہوں ♥",
+  disclaimer:"⚠ <b>اہم نوٹ:</b> یہ <b>خون ابھی</b> کا ڈیمو ورژن ہے۔ اس میں دکھائے گئے تمام ڈونرز، فون نمبرز، اسپتال کی درخواستیں اور فاصلے فرضی ہیں — اصل ڈیٹا نہیں۔ اصل ایمرجنسی میں ہمیشہ <b>ریسکیو 1122</b> یا قریبی اسپتال سے رابطہ کریں۔ خون دینے سے پہلے اسپتال میں بلڈ ٹیسٹ اور اسکریننگ لازمی ہوتی ہے۔",
+  footerBrand:"خون ابھی — Khoon Abhi", footerText:"پاکستان کے لیے بنایا گیا ایک خیال: ضرورت کے وقت خون، بغیر فونوں کی بھرمار کے۔<br>ایک عطیہ = تین زندگیاں۔", footerEmerg:"ایمرجنسی:", footer1122:"1122 (ریسکیو)", footerDemo:"یہ صفحہ ڈیمو ہے — کوئی ڈیٹا محفوظ نہیں ہوتا۔",
+  noGroup:"ابھی کوئی گروپ نہیں چنا — تمام ڈونرز دکھائے جا رہے ہیں",
+  guideNote:"💡 <b>رہنمائی:</b> O− والے ڈونر ہر مریض کو خون دے سکتے ہیں، اس لیے ایمرجنسی میں سب سے قیمتی ہوتے ہیں۔ AB+ والے مریض کو ہر گروپ کا خون لگ سکتا ہے۔ نیچے چارٹ میں مکمل تفصیل دیکھیں۔",
+  found:"ڈونر ملے", availNow:"● ابھی دستیاب ہے", notAvail:"● فی الحال دستیاب نہیں", universalTag:"⭐ یونیورسل ڈونر — سب کو دے سکتا ہے",
+  timesDonated:"بار عطیہ دے چکے ہیں", demoNum:"DEMO نمبر", call:"📞 کال کریں", msg:"💬 پیغام",
+  distLabel:"فاصلہ", lastLabel:"آخری عطیہ", demoNumNote:"یہ فرضی نمبر ہے، اصل نہیں۔",
+  emptyTitle:"کوئی ڈونر نہیں ملا", emptyText:"فلٹر بدلیں، دوسرا شہر آزمائیں، یا نیچے اسپتال کی درخواست بھیجیں تاکہ مزید ڈونرز کو اطلاع جائے۔", emptyBtn:"اسپتال کی درخواست بھیجیں",
+  msgToastSuffix:" کو پیغام بھیجنے کا فیچر اصل ایپ میں آئے گا — یہ ڈیمو ہے۔",
+  resetToast:"تمام فلٹر صاف ہو گئے — تمام ڈونرز دکھائے جا رہے ہیں۔",
+  fillRequired:"براہ کرم تمام ضروری خانے (*) بھریں۔", fillDonor:"براہ کرم نام، بلڈ گروپ اور شہر ضرور بھریں۔",
+  selectOpt:"منتخب کریں", selectGroupOpt:"— اپنا بلڈ گروپ منتخب کریں —",
+  bottles:["1 بوتل","2 بوتلیں","3 بوتلیں","4+ بوتلیں"], urgency:["فوری — ابھی چاہیے","آج کے اندر","کل تک"],
+  lastOptions:["کبھی نہیں دیا — پہلی بار ہے","3 ماہ سے زیادہ پہلے","1–3 ماہ پہلے","1 ماہ سے کم پہلے"],
+  urgentBadge:"فوری", normalBadge:"معمول", newBadge:"نئی",
+  tableCorner:"مریض ↓ \\ ڈونر →", legendYes:"لگ سکتا ہے", legendNo:"نہیں لگ سکتا", legendUni:"⭐ O− = یونیورسل ڈونر (سب کو دے سکتا ہے)", legendAB:"⭐ AB+ = یونیورسل مریض (سب سے لے سکتا ہے)",
+  areaNotGiven:"علاقہ درج نہیں", newDonorDist:"— نیا ڈونر", justNow:"ابھی ابھی (آپ کی ڈیمو درخواست)",
+  needWord:"خون درکار"
+},
+en: {
+  emergencyText:"🚨 Emergency? Don't wait — call Rescue 1122 right now",
+  emergencyCall:"📞 Call 1122",
+  demoBadge:"⚠ DEMO — This is demo data, not real donors",
+  liveDot:"12 donors listed in demo — 10 available now",
+  dropNeed:"Most<br>needed",
+  h1:"Khoon Abhi", h1sub:"خون ابھی • BLOOD, RIGHT NOW",
+  heroSub:"Need blood at the hospital? No need to call around endlessly. Pick your blood group, see <strong>nearby donors</strong> and call in one tap. One bottle of blood can save <strong>three lives</strong>.",
+  stat1:"Demo donors — 10 available, 2 unavailable", stat2num:"5 cities", stat2:"Jacobabad, Karachi, Lahore, Sukkur, Hyderabad", stat3num:"8 groups", stat3:"Search across all blood groups",
+  navSearch:"🔍 Find a donor", navDonors:"🩸 Donor list", navCompat:"🔄 Which blood matches?", navRequest:"🏥 Hospital request", navRegister:"✋ Become a donor",
+  kickerStep1:"Step 1 — Pick a blood group", searchTitle:"Which blood group do you need?", searchSub:"As soon as you pick a group, only donors whose blood matches will be shown.", resetBtn:"↺ Clear all",
+  pickerLabel:"Select the patient's blood group",
+  gRare:"Rare", gCommon:"Common", gRare2:"Rare", gCommon2:"Common", gRare3:"Rare", gCommon3:"Common", gVeryRare:"Very rare", gABplus:"Can receive all groups", gAll:"Show all groups — clear filter",
+  searchPh:"Search by name or area — e.g. Gulshan, Jacobabad...",
+  kickerDonors:"Nearby donors", donorsTitle:"Donor list", donorsSub:"All names, numbers and distances are <b>made up for this demo</b> — they are not real people. The call button dials a demo number too.",
+  kickerLive:"Live requests — Demo", liveTitle:"Latest hospital requests", liveSub:"These are sample requests so you can see how this section will look in the real app.",
+  kickerInfo:"Information", compatTitle:"Who can receive which blood?", compatSub:"Patient's group is on the side, donor's group on top. ✓ means this blood can be given.",
+  compatLabel:"Pick your group to instantly see which donors' blood you can receive",
+  kickerHow:"How it works", howTitle:"How does it work?",
+  step1t:"Pick group & city", step1p:"Select the patient's blood group and your city. Only matching nearby donors will appear.",
+  step2t:"Call in one tap", step2p:"Tap the call button on a donor's card, agree on place and time. You can also send a hospital request from here.",
+  step3t:"Save a life", step3p:"The donor reaches the hospital and donates. One donation can help up to three patients.",
+  kickerForm:"Forms", formTitle:"Send a request or become a donor", formSub:"This is a demo — submitting a form saves nothing; it only appears on this screen.",
+  hFormTitle:"🏥 Hospital request", hFormSub:"The hospital or patient's family fills this form — nearby donors get notified (in this demo, only a confirmation message appears).",
+  hName:"Hospital name *", hNamePh:"e.g. Civil Hospital Jacobabad", hGroup:"Blood group needed *", hBottles:"How many bottles? *", hCity:"City *", hUrgency:"Urgency", hPhone:"Contact number (type anything in demo)", hNote:"Extra details", hNotePh:"Patient's condition, ward, or anything important...", hSubmit:"Send request →",
+  dFormTitle:"✋ I want to become a donor", dFormSub:"After registering, your name joins the donor list below — only on this demo screen; nothing is saved anywhere.",
+  dName:"Your name *", dNamePh:"Write your full name", dGroup:"Blood group *", dCity:"City *", dArea:"Area / neighbourhood", dAreaPh:"e.g. Gulshan-e-Iqbal, Model Town...", dPhone:"Mobile number (demo)", dLast:"When did you last donate blood?", dSubmit:"Join as a donor ♥",
+  disclaimer:"⚠ <b>Important note:</b> This is a demo version of <b>Khoon Abhi</b>. All donors, phone numbers, hospital requests and distances shown here are fictional — not real data. In a real emergency, always contact <b>Rescue 1122</b> or the nearest hospital. A blood test and screening at the hospital is mandatory before any donation.",
+  footerBrand:"Khoon Abhi — خون ابھی", footerText:"An idea built for Pakistan: blood when you need it, without endless phone calls.<br>One donation = three lives.", footerEmerg:"Emergency:", footer1122:"1122 (Rescue)", footerDemo:"This page is a demo — no data is saved.",
+  noGroup:"No group selected yet — showing all donors",
+  guideNote:"💡 <b>Guide:</b> O− donors can give blood to every patient, so they are the most valuable in an emergency. AB+ patients can receive blood from every group. See the full chart below.",
+  found:"donors found", availNow:"● Available now", notAvail:"● Not available right now", universalTag:"⭐ Universal donor — can give to everyone",
+  timesDonated:"donations so far", demoNum:"DEMO number", call:"📞 Call", msg:"💬 Message",
+  distLabel:"Distance", lastLabel:"Last donation", demoNumNote:"This is a fictional number, not real.",
+  emptyTitle:"No donor found", emptyText:"Change the filter, try another city, or send a hospital request below so more donors get notified.", emptyBtn:"Send a hospital request",
+  msgToastSuffix:" — messaging will be available in the real app. This is a demo.",
+  resetToast:"All filters cleared — showing all donors.",
+  fillRequired:"Please fill in all required fields (*).", fillDonor:"Please fill in your name, blood group and city.",
+  selectOpt:"Select", selectGroupOpt:"— Select your blood group —",
+  bottles:["1 bottle","2 bottles","3 bottles","4+ bottles"], urgency:["Urgent — needed now","Within today","By tomorrow"],
+  lastOptions:["Never donated — first time","More than 3 months ago","1–3 months ago","Less than 1 month ago"],
+  urgentBadge:"Urgent", normalBadge:"Normal", newBadge:"New",
+  tableCorner:"Patient ↓ \\ Donor →", legendYes:"Can be given", legendNo:"Cannot be given", legendUni:"⭐ O− = Universal donor (can give to all)", legendAB:"⭐ AB+ = Universal patient (can receive from all)",
+  areaNotGiven:"Area not given", newDonorDist:"— New donor", justNow:"Just now (your demo request)",
+  needWord:"blood needed"
+}};
+
+var SAMPLE_REQUESTS = {
+  ur: [
+    {title:"سول اسپتال، جیکب آباد — O+ خون درکار (2 بوتل)", sub:"مریض: حادثے کا کیس • 25 منٹ پہلے درخواست آئی", badge:"urgent"},
+    {title:"جناح اسپتال، کراچی — B− خون درکار (1 بوتل)", sub:"مریض: آپریشن کے لیے • 1 گھنٹہ پہلے", badge:"urgent"},
+    {title:"میو اسپتال، لاہور — A+ خون درکار (3 بوتل)", sub:"مریض: تھیلیسیمیا کا بچہ • آج صبح", badge:"normal"}
+  ],
+  en: [
+    {title:"Civil Hospital, Jacobabad — O+ blood needed (2 bottles)", sub:"Patient: accident case • Requested 25 minutes ago", badge:"urgent"},
+    {title:"Jinnah Hospital, Karachi — B− blood needed (1 bottle)", sub:"Patient: for surgery • 1 hour ago", badge:"urgent"},
+    {title:"Mayo Hospital, Lahore — A+ blood needed (3 bottles)", sub:"Patient: thalassemia child • This morning", badge:"normal"}
+  ]
+};
+
+// --- Demo data: ALL fake, demo numbers (0300-00000xx). Urdu + English fields ---
+var donors = [
+  {name:"احمد رضا", nameEn:"Ahmed Raza", group:"O+", city:"جیکب آباد", area:"سول اسپتال کے قریب، اسٹیشن روڈ", areaEn:"Near Civil Hospital, Station Road", dist:"0.8 کلومیٹر", distEn:"0.8 km", phone:"03000000001", last:"3 ماہ پہلے", lastEn:"3 months ago", lastIdx:1, avail:true, donations:6},
+  {name:"علی حسن", nameEn:"Ali Hassan", group:"O-", city:"جیکب آباد", area:"مولاداد روڈ", areaEn:"Mouladad Road", dist:"1.2 کلومیٹر", distEn:"1.2 km", phone:"03000000002", last:"4 ماہ پہلے", lastEn:"4 months ago", lastIdx:1, avail:true, donations:11, universal:true},
+  {name:"محمد علی", nameEn:"Muhammad Ali", group:"A+", city:"کراچی", area:"گلشن اقبال، بلاک 13", areaEn:"Gulshan-e-Iqbal, Block 13", dist:"2.1 کلومیٹر", distEn:"2.1 km", phone:"03000000003", last:"2 ماہ پہلے", lastEn:"2 months ago", lastIdx:2, avail:true, donations:4},
+  {name:"فاطمہ زہرا", nameEn:"Fatima Zahra", group:"B+", city:"لاہور", area:"ماڈل ٹاؤن", areaEn:"Model Town", dist:"1.5 کلومیٹر", distEn:"1.5 km", phone:"03000000004", last:"5 ماہ پہلے", lastEn:"5 months ago", lastIdx:1, avail:true, donations:3},
+  {name:"زینب بی بی", nameEn:"Zainab Bibi", group:"AB+", city:"کراچی", area:"نارتھ ناظم آباد", areaEn:"North Nazimabad", dist:"3.4 کلومیٹر", distEn:"3.4 km", phone:"03000000005", last:"3 ماہ پہلے", lastEn:"3 months ago", lastIdx:1, avail:false, donations:2},
+  {name:"بلال احمد", nameEn:"Bilal Ahmed", group:"A-", city:"سکھر", area:"نیو سکھر، گولیمار", areaEn:"New Sukkur, Golimar", dist:"1.0 کلومیٹر", distEn:"1.0 km", phone:"03000000006", last:"6 ماہ پہلے", lastEn:"6 months ago", lastIdx:1, avail:true, donations:7},
+  {name:"حسن رضا", nameEn:"Hassan Raza", group:"B-", city:"لاہور", area:"جوہر ٹاؤن", areaEn:"Johar Town", dist:"2.8 کلومیٹر", distEn:"2.8 km", phone:"03000000007", last:"3 ماہ پہلے", lastEn:"3 months ago", lastIdx:1, avail:true, donations:5},
+  {name:"عائشہ خان", nameEn:"Ayesha Khan", group:"O+", city:"کراچی", area:"ڈیفنس، فیز 6", areaEn:"Defence, Phase 6", dist:"4.2 کلومیٹر", distEn:"4.2 km", phone:"03000000008", last:"4 ماہ پہلے", lastEn:"4 months ago", lastIdx:1, avail:true, donations:8},
+  {name:"عمر فاروق", nameEn:"Umar Farooq", group:"AB-", city:"جیکب آباد", area:"جانی ڈیرو روڈ", areaEn:"Jani Dero Road", dist:"2.0 کلومیٹر", distEn:"2.0 km", phone:"03000000009", last:"7 ماہ پہلے", lastEn:"7 months ago", lastIdx:1, avail:true, donations:2},
+  {name:"خالد محمود", nameEn:"Khalid Mehmood", group:"O+", city:"حیدرآباد", area:"لطیف آباد، یونٹ 7", areaEn:"Latifabad, Unit 7", dist:"1.7 کلومیٹر", distEn:"1.7 km", phone:"03000000010", last:"3 ماہ پہلے", lastEn:"3 months ago", lastIdx:1, avail:true, donations:9},
+  {name:"سارہ احمد", nameEn:"Sara Ahmed", group:"A+", city:"لاہور", area:"گلبرگ 3", areaEn:"Gulberg 3", dist:"2.3 کلومیٹر", distEn:"2.3 km", phone:"03000000011", last:"2 ماہ پہلے", lastEn:"2 months ago", lastIdx:2, avail:false, donations:1},
+  {name:"یوسف خان", nameEn:"Yousuf Khan", group:"B+", city:"کراچی", area:"کورنگی، سیکٹر 33", areaEn:"Korangi, Sector 33", dist:"3.0 کلومیٹر", distEn:"3.0 km", phone:"03000000012", last:"5 ماہ پہلے", lastEn:"5 months ago", lastIdx:1, avail:true, donations:4}
+];
+
+var canReceiveFrom = {
+  "O-": ["O-"], "O+": ["O-","O+"], "A-": ["O-","A-"], "A+": ["O-","O+","A-","A+"],
+  "B-": ["O-","B-"], "B+": ["O-","O+","B-","B+"], "AB-": ["O-","A-","B-","AB-"],
+  "AB+": ["O-","O+","A-","A+","B-","B+","AB-","AB+"]
+};
+var allGroups = ["O-","O+","A-","A+","B-","B+","AB-","AB+"];
+var state = { needGroup:"", city:"", query:"" };
+var lang = "ur";
+var userRequests = []; // requests added via hospital form, kept across language switches
+
+function t(k){ return I18N[lang][k]; }
+function cityName(key){ return CITIES[lang][key] || key; }
+function donorName(d){ return lang==="en" ? (d.nameEn||d.name) : d.name; }
+function donorCity(d){ return lang==="en" ? cityName(d.city) : d.city; }
+function donorArea(d){ return lang==="en" ? (d.areaEn||d.area) : d.area; }
+function donorDist(d){ return lang==="en" ? (d.distEn||d.dist) : d.dist; }
+function donorLast(d){ if(typeof d.lastIdx==="number" && I18N[lang].lastOptions[d.lastIdx]) return I18N[lang].lastOptions[d.lastIdx]; return lang==="en" ? (d.lastEn||d.last) : d.last; }
+function initials(name){ return name.trim().split(" ").map(function(w){return w[0]}).slice(0,2).join(" ") }
+function fmtPhone(p){ return p.replace(/(\d{4})(\d{7})/,"$1-$2") }
+function esc(s){ return String(s).replace(/</g,"&lt;"); }
+
+function renderDonors(){
+  var grid = document.getElementById("donorGrid");
+  var allowed = state.needGroup ? canReceiveFrom[state.needGroup] : null;
+  var list = donors.filter(function(d){
+    if(allowed && allowed.indexOf(d.group)===-1) return false;
+    if(state.city && d.city!==state.city) return false;
+    if(state.query){
+      var q = state.query.trim().toLowerCase();
+      var hay = (d.name+" "+d.nameEn+" "+d.area+" "+d.areaEn+" "+d.city+" "+cityName(d.city)+" "+d.group).toLowerCase();
+      if(hay.indexOf(q)===-1) return false;
+    }
+    return true;
+  });
+  list.sort(function(a,b){ if(a.avail!==b.avail) return a.avail?-1:1; if(!!b.universal!==!!a.universal) return b.universal?1:-1; return 0; });
+  document.getElementById("countLabel").textContent = "— " + list.length + " " + t("found");
+  if(list.length===0){
+    grid.innerHTML = '<div class="empty"><b>'+t("emptyTitle")+'</b>'+t("emptyText")+'<br><br><a class="btn btn-call" style="max-width:280px;margin:0 auto" href="#request">'+t("emptyBtn")+'</a></div>';
+    return;
+  }
+  grid.innerHTML = list.map(function(d){
+    var availTag = d.avail ? '<span class="tag green">'+t("availNow")+'</span>' : '<span class="tag amber">'+t("notAvail")+'</span>';
+    var uniTag = d.universal ? '<span class="tag" style="background:#FEF3C7;border-color:#FDE68A;color:#92400E">'+t("universalTag")+'</span>' : '';
+    var nm = donorName(d);
+    return '<article class="donor">'
+      + '<div class="donor-top"><div class="avatar" aria-hidden="true">'+initials(nm)+'</div>'
+      + '<div><h3>'+esc(nm)+'</h3><div class="donor-meta">📍 '+esc(donorCity(d))+' — '+esc(donorArea(d))+'<br>🚶 '+t("distLabel")+': '+esc(donorDist(d))+' • '+t("lastLabel")+': '+esc(donorLast(d))+'</div></div>'
+      + '<div class="blood-badge" aria-label="Blood group '+d.group+'">'+d.group.replace("-","−")+'</div></div>'
+      + '<div class="tags">'+availTag+uniTag+'<span class="tag">♥ '+d.donations+' '+t("timesDonated")+'</span><span class="tag">'+t("demoNum")+'</span></div>'
+      + '<div class="donor-actions"><a class="btn btn-call" href="tel:+92'+d.phone.slice(1)+'">'+t("call")+'</a>'
+      + '<button class="btn btn-wa" type="button" data-toastname="'+esc(nm)+'">'+t("msg")+'</button></div>'
+      + '<div class="donor-meta" style="font-size:12px">'+t("demoNum")+': <span dir="ltr">'+fmtPhone(d.phone)+'</span> — '+t("demoNumNote")+'</div>'
+      + '</article>';
+  }).join("");
+  grid.querySelectorAll("[data-toastname]").forEach(function(b){
+    b.addEventListener("click", function(){ showToast(b.getAttribute("data-toastname") + t("msgToastSuffix")); });
+  });
+}
+
+function showToast(msg){
+  var el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(window._tt); window._tt = setTimeout(function(){ el.classList.remove("show"); }, 3200);
+}
+
+function renderCityFilters(){
+  var wrap = document.getElementById("cityFilters");
+  wrap.innerHTML = CITY_KEYS.map(function(k){
+    return '<button class="chip'+(state.city===k?" active":"")+'" data-city="'+k+'" type="button">'+cityName(k)+'</button>';
+  }).join("");
+}
+function renderRequests(){
+  var list = document.getElementById("requestList");
+  var html = userRequests.map(function(r){
+    var title = r.hospital + " — " + r.group.replace("-","−") + " " + t("needWord") + " (" + r.bottles + ")";
+    return '<div class="request-item"><div><b>'+esc(title)+'</b><p>'+(lang==="en"?"City: ":"شہر: ")+esc(cityName(r.city))+' • '+t("justNow")+'</p></div><span class="'+(r.urgent?"urgent":"normal")+'">'+(r.urgent?t("urgentBadge"):t("newBadge"))+'</span></div>';
+  }).join("");
+  html += SAMPLE_REQUESTS[lang].map(function(r){
+    return '<div class="request-item"><div><b>'+r.title+'</b><p>'+r.sub+'</p></div><span class="'+(r.badge==="urgent"?"urgent":"normal")+'">'+(r.badge==="urgent"?t("urgentBadge"):t("normalBadge"))+'</span></div>';
+  }).join("");
+  list.innerHTML = html;
+}
+function renderCompat(){
+  document.getElementById("compatHead").innerHTML = '<th>'+t("tableCorner")+'</th>' + allGroups.map(function(g){ return '<th>'+g.replace("-","−")+'</th>'; }).join("");
+  document.getElementById("compatBody").innerHTML = allGroups.map(function(recipient){
+    var cells = allGroups.map(function(donor){
+      var ok = canReceiveFrom[recipient].indexOf(donor)!==-1;
+      return '<td class="'+(ok?"yes":"no")+'">'+(ok?"✓":"—")+'</td>';
+    }).join("");
+    return '<tr><td>'+recipient.replace("-","−")+(recipient==="O-"||recipient==="AB+"?" ⭐":"")+'</td>'+cells+'</tr>';
+  }).join("");
+  document.getElementById("compatLegend").innerHTML = '<span><span class="yes">✓</span> '+t("legendYes")+'</span><span><span class="no">—</span> '+t("legendNo")+'</span><span>'+t("legendUni")+'</span><span>'+t("legendAB")+'</span>';
+  var sel = document.getElementById("compatSelect");
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">'+t("selectGroupOpt")+'</option>' + allGroups.map(function(g){ return '<option'+(g===cur?" selected":"")+'>'+g+'</option>'; }).join("");
+  updateCompatResult();
+}
+function fillSelect(id, options, keepValue){
+  var sel = document.getElementById(id);
+  var cur = keepValue ? sel.value : "";
+  sel.innerHTML = options.map(function(o){ return '<option value="'+esc(o.value)+'"'+(o.value===cur?" selected":"")+'>'+esc(o.label)+'</option>'; }).join("");
+}
+function renderFormSelects(){
+  var groupOpts = [{value:"", label:t("selectOpt")}] .concat(allGroups.map(function(g){ return {value:g, label:g}; }));
+  fillSelect("hGroup", groupOpts, true);
+  fillSelect("dGroup", groupOpts, true);
+  var bottleOpts = [{value:"", label:t("selectOpt")}].concat(I18N[lang].bottles.map(function(b){ return {value:b, label:b}; }));
+  fillSelect("hBottles", bottleOpts, false);
+  var cityOpts = [{value:"", label:t("selectOpt")}].concat(["جیکب آباد","کراچی","لاہور","سکھر","حیدرآباد","دیگر"].map(function(c){ return {value:c, label:cityName(c)}; }));
+  fillSelect("hCity", cityOpts, true);
+  fillSelect("dCity", cityOpts, true);
+  fillSelect("hUrgency", I18N[lang].urgency.map(function(u){ return {value:u, label:u}; }), false);
+  fillSelect("dLast", I18N[lang].lastOptions.map(function(u){ return {value:u, label:u}; }), false);
+}
+function updatePickerNote(){
+  var label = document.getElementById("selectedLabel");
+  var note = document.getElementById("compatNote");
+  if(state.needGroup){
+    var from = canReceiveFrom[state.needGroup].join(lang==="en" ? ", " : "، ");
+    if(lang==="en"){
+      label.textContent = "Showing compatible donors for " + state.needGroup.replace("-","−");
+      note.innerHTML = "🩸 A patient with <b>" + state.needGroup.replace("-","−") + "</b> can receive blood from these groups: <b>" + from + "</b> — that is why only donors from these groups are shown below.";
+    } else {
+      label.textContent = state.needGroup.replace("-","−") + " کے لیے مطابق ڈونرز دکھائے جا رہے ہیں";
+      note.innerHTML = "🩸 <b>" + state.needGroup.replace("-","−") + " والے مریض</b> کو ان گروپس کا خون لگ سکتا ہے: <b>" + from + "</b> — اسی لیے نیچے صرف انہی گروپس کے ڈونرز نظر آ رہے ہیں۔";
+    }
+  } else {
+    label.textContent = t("noGroup");
+    note.innerHTML = t("guideNote");
+  }
+}
+function updateCompatResult(){
+  var g = document.getElementById("compatSelect").value, out = document.getElementById("compatResult");
+  if(!g){ out.innerHTML=""; return; }
+  var from = canReceiveFrom[g];
+  var count = donors.filter(function(d){ return from.indexOf(d.group)!==-1 && d.avail; }).length;
+  var joiner = lang==="en" ? ", " : "، ";
+  if(lang==="en"){
+    out.innerHTML = "Your group is <b>" + g.replace("-","−") + "</b> — you can receive blood from donors of these groups: <b>" + from.join(joiner) + "</b>.<br>In this demo list, <b>" + count + " available donors</b> match you right now. <a href=\"#search\" style=\"color:var(--red);font-weight:800\">Select your group above →</a>";
+  } else {
+    out.innerHTML = "آپ کا گروپ <b>" + g.replace("-","−") + "</b> ہے — آپ کو ان گروپس کے ڈونرز کا خون لگ سکتا ہے: <b>" + from.join(joiner) + "</b>۔<br>اس ڈیمو لسٹ میں اس وقت <b>" + count + " دستیاب ڈونر</b> آپ کے لیے مطابق ہیں۔ <a href=\"#search\" style=\"color:var(--red);font-weight:800\">اوپر جا کر اپنا گروپ منتخب کریں →</a>";
+  }
+}
+
+function setLang(newLang){
+  lang = newLang;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang==="en" ? "ltr" : "rtl";
+  document.title = lang==="en" ? "Khoon Abhi — خون ابھی" : "خون ابھی — Khoon Abhi";
+  document.querySelectorAll("[data-setlang]").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-setlang")===lang); });
+  document.querySelectorAll("[data-i18n]").forEach(function(el){ var v = I18N[lang][el.getAttribute("data-i18n")]; if(v!=null) el.textContent = v; });
+  document.querySelectorAll("[data-i18n-html]").forEach(function(el){ var v = I18N[lang][el.getAttribute("data-i18n-html")]; if(v!=null) el.innerHTML = v; });
+  document.querySelectorAll("[data-i18n-ph]").forEach(function(el){ var v = I18N[lang][el.getAttribute("data-i18n-ph")]; if(v!=null) el.setAttribute("placeholder", v); });
+  // Clear form success boxes (they contain old-language text)
+  document.getElementById("hospitalSuccess").classList.remove("show");
+  document.getElementById("donorSuccess").classList.remove("show");
+  renderCityFilters(); renderRequests(); renderCompat(); renderFormSelects(); updatePickerNote(); renderDonors();
+}
+
+document.querySelectorAll("[data-setlang]").forEach(function(b){
+  b.addEventListener("click", function(){ setLang(b.getAttribute("data-setlang")); });
+});
+
+// Group picker
+document.getElementById("groupPicker").addEventListener("click", function(e){
+  var btn = e.target.closest(".group-btn"); if(!btn) return;
+  document.querySelectorAll(".group-btn").forEach(function(b){ b.classList.remove("selected"); });
+  btn.classList.add("selected");
+  state.needGroup = btn.getAttribute("data-group");
+  updatePickerNote();
+  renderDonors();
+  document.getElementById("donors").scrollIntoView({behavior:"smooth", block:"start"});
+});
+// City filters (delegated, re-rendered on language change)
+document.getElementById("cityFilters").addEventListener("click", function(e){
+  var btn = e.target.closest(".chip"); if(!btn) return;
+  state.city = btn.getAttribute("data-city");
+  renderCityFilters();
+  renderDonors();
+});
+document.getElementById("searchInput").addEventListener("input", function(e){ state.query = e.target.value; renderDonors(); });
+document.getElementById("resetBtn").addEventListener("click", function(){
+  state = {needGroup:"", city:"", query:""};
+  document.getElementById("searchInput").value = "";
+  document.querySelectorAll(".group-btn").forEach(function(b){ b.classList.remove("selected"); });
+  renderCityFilters(); updatePickerNote(); renderDonors();
+  showToast(t("resetToast"));
+});
+document.getElementById("compatSelect").addEventListener("change", updateCompatResult);
+
+// Hospital form (in-memory only)
+document.getElementById("hospitalForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var name = document.getElementById("hName").value.trim();
+  var group = document.getElementById("hGroup").value;
+  var bottlesVal = document.getElementById("hBottles").value;
+  var city = document.getElementById("hCity").value;
+  var urgencyVal = document.getElementById("hUrgency").value;
+  if(!name || !group || !bottlesVal || !city){ showToast(t("fillRequired")); return; }
+  // Normalise bottles label to current language for display; store index
+  var bIdx = I18N[lang].bottles.indexOf(bottlesVal);
+  var bottlesLabel = bIdx>=0 ? I18N[lang].bottles[bIdx] : bottlesVal;
+  var isUrgent = urgencyVal === I18N.ur.urgency[0] || urgencyVal === I18N.en.urgency[0];
+  var id = "KA-" + Math.floor(1000 + Math.random()*9000);
+  userRequests.unshift({hospital:name, group:group, bottles:bottlesLabel, city:city, urgent:isUrgent});
+  var box = document.getElementById("hospitalSuccess");
+  if(lang==="en"){
+    box.innerHTML = "<b>✓ Request received (demo)</b><br>Request number: <b dir=\"ltr\">" + id + "</b><br>" + esc(name) + " — " + group.replace("-","−") + " blood, " + esc(bottlesLabel) + ", City: " + esc(cityName(city)) + "<br>In the real app, this request will be sent instantly to nearby matching donors. Nothing was saved in this demo.";
+  } else {
+    box.innerHTML = "<b>✓ درخواست موصول ہو گئی (ڈیمو)</b><br>درخواست نمبر: <b dir=\"ltr\">" + id + "</b><br>" + esc(name) + " — " + group.replace("-","−") + " خون، " + esc(bottlesLabel) + "، شہر: " + esc(cityName(city)) + "<br>اصل ایپ میں یہ درخواست قریبی مطابق ڈونرز کو فوراً بھیجی جائے گی۔ اس ڈیمو میں کوئی ڈیٹا محفوظ نہیں ہوا۔";
+  }
+  box.classList.add("show");
+  renderRequests();
+  showToast((lang==="en" ? "Request added — number " : "درخواست شامل ہو گئی — نمبر ") + id);
+  this.reset(); renderFormSelects();
+});
+
+// Donor form (in-memory only)
+document.getElementById("donorForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var name = document.getElementById("dName").value.trim();
+  var group = document.getElementById("dGroup").value;
+  var city = document.getElementById("dCity").value;
+  var area = document.getElementById("dArea").value.trim();
+  var lastVal = document.getElementById("dLast").value;
+  if(!name || !group || !city){ showToast(t("fillDonor")); return; }
+  var lastIdx = I18N[lang].lastOptions.indexOf(lastVal);
+  if(lastIdx<0) lastIdx = 0;
+  var cleanName = name.replace(/</g,"");
+  donors.unshift({name:cleanName, nameEn:cleanName, group:group, city:city, area: area || t("areaNotGiven"), areaEn: area || "Area not given", dist:t("newDonorDist"), distEn:"— New donor", phone:"03000000099", last:lastVal, lastEn:lastVal, lastIdx:lastIdx, avail: lastIdx!==3, donations:0, universal: group==="O-"});
+  var box = document.getElementById("donorSuccess");
+  if(lang==="en"){
+    box.innerHTML = "<b>♥ Thank you, " + esc(cleanName) + "!</b><br>You have been added to the donor list (only on this demo screen). Your card will appear at the top of the list above. This information disappears when you close the page.";
+  } else {
+    box.innerHTML = "<b>♥ شکریہ، " + esc(cleanName) + "!</b><br>آپ ڈونر لسٹ میں شامل ہو گئے ہیں (صرف اس ڈیمو اسکرین پر)۔ اوپر ڈونرز کی لسٹ میں آپ کا کارڈ سب سے پہلے نظر آئے گا۔ صفحہ بند کرتے ہی یہ معلومات ختم ہو جائے گی۔";
+  }
+  box.classList.add("show");
+  renderDonors();
+  showToast(lang==="en" ? "You have been added to the donor list — thank you!" : "آپ ڈونر لسٹ میں شامل ہو گئے ہیں — جزاک اللہ!");
+  this.reset(); renderFormSelects();
+  document.getElementById("donors").scrollIntoView({behavior:"smooth"});
+});
+
+// Init in Urdu (default)
+setLang("ur");
+</script>
+</body>
+</html>
